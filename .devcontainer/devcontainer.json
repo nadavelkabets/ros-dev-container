@@ -1,0 +1,41 @@
+{
+  "dockerComposeFile": [
+    "../docker/compose/dev_container/docker-compose.yml"
+  ],
+  "service": "development_environment",
+  "workspaceFolder": "/workspace",
+  "containerUser": "user",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.vscode-pylance",
+        "ms-python.python",
+        "ms-python.pylint",
+        "ms-iot.vscode-ros"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "/bin/bash"
+          }
+        },
+        "python.testing.unittestEnabled": false,
+        "python.testing.pytestEnabled": true,
+        "filed.exclude": {
+          "**/__pycache__": true,
+          "**/.git": true,
+          "**/.pytest_cache": true,
+          "**/.mypy_cache": true
+        },
+        "files.autoSaveDelay": 300,
+        "files.autoSave": "afterDelay",
+        "python.analysis.autoImportCompletions": true,
+        "python.defaultInterpreterPath": "/usr/bin/python3",
+        "files.insertFinalNewline": true,
+        "python.autoComplete.extraPaths": [""],
+        "python.analysis.extraPaths": [""]
+      }
+    }
+  }
+}

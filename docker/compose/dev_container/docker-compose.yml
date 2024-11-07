@@ -1,0 +1,22 @@
+services:
+  development_environment:
+    build:
+      context: ${PWD},
+      dockerfile: docker/dockerfiles/dev_container.dockerfile
+    environment:
+      - DISPLAY=${DISPLAY}
+      - MAVLINK_DIALECT=ardupilotmega
+      - MAVLINK20=1
+    privileged: true
+    command: sleep infinity
+    volumes:
+      - ${PWD}:/workspace
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /var/run/docker.sock:/var/run/docker.sock
+    hostname: dev_env
+    networks:
+      - dev
+
+networks:
+  dev:
+    driver: bridge
