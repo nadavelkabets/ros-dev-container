@@ -1,7 +1,8 @@
+version: "3.3"
 services:
   development_environment:
     build:
-      context: ${PWD},
+      context: ${PWD}
       dockerfile: docker/dockerfiles/dev_container.dockerfile
     environment:
       - DISPLAY=${DISPLAY}

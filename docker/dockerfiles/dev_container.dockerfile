@@ -11,7 +11,7 @@ RUN groupadd --gid $USER_UID $USERNAME \
 
 USER $USERNAME
 ENV PATH="/home/$USERNAME/.local/bin:$PATH"
-RUN sudo apt-get update && apt-get dist-upgrade -y && sudo apt-get install -y \
+RUN sudo apt-get update && sudo apt-get dist-upgrade -y && sudo apt-get install -y \
     python3-pip \
     curl \
     vim \
