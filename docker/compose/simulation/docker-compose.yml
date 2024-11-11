@@ -1,0 +1,44 @@
+version: "3.3"
+
+services:
+  sitl:
+    image: sitl:latest
+    container_name: sitl
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - sitl_eeprom_cache:/ardupilot/eeprom.bin
+    environment:
+      - DISPLAY=${DISPLAY}
+    priviledged: true
+    stdin_open: true
+    tty: true
+    command:
+      [
+        "sim_vehicle.py",
+        "-v",
+        "ArduCopter",
+        "--map",
+        "--console",
+        "--no-rebuild",
+        "--no-extra-ports",
+        "--out=mission_planner:14550",
+        "-l",
+        "31.4993848,34.8041511,0,0"
+      ]
+    networks: 
+      - dev
+
+  mission_planner:
+    image: mp:latest
+    container_name: mission_planner
+    environment: DISPLAY=${DISPLAY}
+    priviledged: true
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    networks:
+      - dev
+
+
+networks:
+  dev:
+    driver: bridge
