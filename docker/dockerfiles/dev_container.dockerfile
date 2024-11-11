@@ -33,4 +33,4 @@ RUN echo ". /opt/ros/humble/setup.bash" >> ~/.bashrc \
     && echo ". /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" >> ~/.bashrc
 
 WORKDIR /home/user
-ENTRYPOINT ["/bin/add_user_to_docker_group_entry.sh"]
+ENTRYPOINT ["/tmp/scripts/add_user_to_docker_group_entry.sh"]
