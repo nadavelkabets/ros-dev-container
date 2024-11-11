@@ -1,4 +1,4 @@
-SHELL=/bin/bash
+SHELL=scripts/environment/makefile_entry.sh
 
 .PHONY: full_simulation
 full_simulation:

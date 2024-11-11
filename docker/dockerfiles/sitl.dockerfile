@@ -28,16 +28,12 @@ RUN git clone --branch Copter-4.3.8 --progress --recurse-submodules https://gith
 ENV SKIP_AP_EXT_ENV=1 SKIP_AP_GRAPHIC_ENV=1 SKIP_AP_COV_ENV=1 SKIP_AP_GIT_CHECK=1
 RUN Tools/environment_install/install-prereqs-ubuntu.sh -y
 
-# add waf alias to ardupilot waf to .bashrc
-RUN echo "alias waf=\"/${USER_NAME}/waf\"" >> ~/ardupilot_entrypoint.sh
-
-# Check that local/bin are in PATH for pip --user installed package
-RUN echo "if [ -d \"\$HOME/.local/bin\" ] ; then\nPATH=\"\$HOME/.local/bin:\$PATH\"\nfi" >> ~/ardupilot_entrypoint.sh
-
 # Create entrypoint as docker cannot do shell substitution correctly
 RUN export ARDUPILOT_ENTRYPOINT="/home/${USER_NAME}/ardupilot_entrypoint.sh" \
     && echo "#!/bin/bash" > $ARDUPILOT_ENTRYPOINT \
     && echo "set -e" >> $ARDUPILOT_ENTRYPOINT \
+    && echo "alias waf=\"/${USER_NAME}/waf\"" >> $ARDUPILOT_ENTRYPOINT \
+    && echo "if [ -d \"\$HOME/.local/bin\" ] ; then\nPATH=\"\$HOME/.local/bin:\$PATH\"\nfi" $ARDUPILOT_ENTRYPOINT \
     && echo "source /home/${USER_NAME}/.ardupilot_env" >> $ARDUPILOT_ENTRYPOINT \
     && echo 'exec "$@"' >> $ARDUPILOT_ENTRYPOINT \
     && chmod +x $ARDUPILOT_ENTRYPOINT \
@@ -52,5 +48,6 @@ RUN sudo apt-get clean \
 RUN ./waf configure --board sitl && ./waf copter
 
 ENV CCACHE_MAXSIZE=1G
+ENV PATH="$PATH:/home/ardupilot/.local/bin/"
 ENTRYPOINT ["/ardupilot_entrypoint.sh"]
 CMD ["bash"]

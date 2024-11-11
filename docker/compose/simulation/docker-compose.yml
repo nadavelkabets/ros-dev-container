@@ -9,7 +9,7 @@ services:
       - sitl_eeprom_cache:/ardupilot/eeprom.bin
     environment:
       - DISPLAY=${DISPLAY}
-    priviledged: true
+    privileged: true
     stdin_open: true
     tty: true
     command:
@@ -29,16 +29,19 @@ services:
       - dev
 
   mission_planner:
-    image: mp:latest
+    image: mp:1.3.80
     container_name: mission_planner
-    environment: DISPLAY=${DISPLAY}
-    priviledged: true
+    environment: 
+      - DISPLAY=${DISPLAY}
+    privileged: true
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
     networks:
       - dev
 
-
 networks:
   dev:
     driver: bridge
+
+volumes:
+  sitl_eeprom_cache:

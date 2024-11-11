@@ -1,0 +1,213 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Config>
+  <AA_CheckEnableAltitudeAngel>False</AA_CheckEnableAltitudeAngel>
+  <APMFirmware>ArduCopter2</APMFirmware>
+  <AUTO_BAUD>115200</AUTO_BAUD>
+  <AutoConnect>[
+  {
+    "Label": "Mavlink default port",
+    "Enabled": true,
+    "Port": 14550,
+    "Protocol": 1,
+    "Format": 0,
+    "Direction": 0,
+    "ConfigString": ""
+  },
+  {
+    "Label": "Mavlink alt port",
+    "Enabled": true,
+    "Port": 14551,
+    "Protocol": 1,
+    "Format": 0,
+    "Direction": 0,
+    "ConfigString": ""
+  },
+  {
+    "Label": "Mavlink sitl port",
+    "Enabled": false,
+    "Port": 5760,
+    "Protocol": 0,
+    "Format": 0,
+    "Direction": 1,
+    "ConfigString": "127.0.0.1"
+  },
+  {
+    "Label": "Video udp 5000 h264",
+    "Enabled": true,
+    "Port": 5000,
+    "Protocol": 1,
+    "Format": 1,
+    "Direction": 0,
+    "ConfigString": "udpsrc port=5000 buffer-size=90000 ! application/x-rtp,media=(string)video,clock-rate=(int)90000,encoding-name=(string)H264 ! decodebin3 ! queue max-size-buffers=1 leaky=2 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink sync=false"
+  },
+  {
+    "Label": "Video udp 5100 h264",
+    "Enabled": true,
+    "Port": 5100,
+    "Protocol": 1,
+    "Format": 1,
+    "Direction": 0,
+    "ConfigString": "udpsrc port=5100 buffer-size=90000 ! application/x-rtp,media=(string)video,clock-rate=(int)90000,encoding-name=(string)H264 ! decodebin3 ! queue max-size-buffers=1 leaky=2 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink sync=false"
+  },
+  {
+    "Label": "Video udp 5600 h264",
+    "Enabled": true,
+    "Port": 5600,
+    "Protocol": 1,
+    "Format": 1,
+    "Direction": 0,
+    "ConfigString": "udpsrc port=5600 buffer-size=90000 ! application/x-rtp,media=(string)video,clock-rate=(int)90000,encoding-name=(string)H264 ! decodebin3 ! queue max-size-buffers=1 leaky=2 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink sync=false"
+  },
+  {
+    "Label": "Video udp 5601 h265",
+    "Enabled": true,
+    "Port": 5601,
+    "Protocol": 1,
+    "Format": 1,
+    "Direction": 0,
+    "ConfigString": "udpsrc port=5601 buffer-size=90000 ! application/x-rtp,media=(string)video,clock-rate=(int)90000,encoding-name=(string)H265 ! decodebin3 ! queue max-size-buffers=1 leaky=2 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink sync=false"
+  },
+  {
+    "Label": "SkyViper",
+    "Enabled": false,
+    "Port": 554,
+    "Protocol": 0,
+    "Format": 1,
+    "Direction": 1,
+    "ConfigString": "rtspsrc location=rtsp://192.168.99.1/media/stream2 debug=false buffer-mode=1 latency=100 ntp-time-source=3 ! application/x-rtp ! decodebin3 ! queue max-size-buffers=1 leaky=2 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink sync=false"
+  },
+  {
+    "Label": "HereLink Wifi",
+    "Enabled": false,
+    "Port": 8554,
+    "Protocol": 0,
+    "Format": 1,
+    "Direction": 1,
+    "ConfigString": "rtspsrc location=rtsp://192.168.43.1:8554/fpv_stream latency=41 udp-reconnect=1 timeout=0 do-retransmission=false ! application/x-rtp ! decodebin3 ! queue max-size-buffers=1 leaky=2 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink sync=false"
+  },
+  {
+    "Label": "HereLink GCS",
+    "Enabled": false,
+    "Port": 8554,
+    "Protocol": 0,
+    "Format": 1,
+    "Direction": 1,
+    "ConfigString": "rtspsrc location=rtsp://192.168.0.10:8554/H264Video latency=41 udp-reconnect=1 timeout=0 do-retransmission=false ! application/x-rtp ! decodebin3 ! queue max-size-buffers=1 leaky=2 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink sync=false"
+  },
+  {
+    "Label": "Serial",
+    "Enabled": false,
+    "Port": 57600,
+    "Protocol": 2,
+    "Format": 0,
+    "Direction": 1,
+    "ConfigString": ""
+  }
+]</AutoConnect>
+  <comport>UDP</comport>
+  <displayview>{
+  "displayRTKInject": true,
+  "displayGPSOrder": true,
+  "displayHWIDs": true,
+  "displayADSB": true,
+  "displayName": 1,
+  "displaySimulation": true,
+  "displayTerminal": true,
+  "displayDonate": true,
+  "displayHelp": true,
+  "displayAnenometer": true,
+  "displayQuickTab": true,
+  "displayPreFlightTab": true,
+  "displayAdvActionsTab": true,
+  "displaySimpleActionsTab": false,
+  "displayGaugesTab": true,
+  "displayStatusTab": true,
+  "displayServoTab": true,
+  "displayScriptsTab": true,
+  "displayTelemetryTab": true,
+  "displayDataflashTab": true,
+  "displayMessagesTab": true,
+  "displayRallyPointsMenu": true,
+  "displayGeoFenceMenu": true,
+  "displaySplineCircleAutoWp": true,
+  "displayTextAutoWp": true,
+  "displayCircleSurveyAutoWp": true,
+  "displayPoiMenu": true,
+  "displayTrackerHomeMenu": true,
+  "displayCheckHeightBox": true,
+  "displayPluginAutoWp": true,
+  "displayInstallFirmware": true,
+  "displayWizard": true,
+  "displayFrameType": true,
+  "displayAccelCalibration": true,
+  "displayCompassConfiguration": true,
+  "displayRadioCalibration": true,
+  "displayEscCalibration": true,
+  "displayFlightModes": true,
+  "displayFailSafe": true,
+  "displaySikRadio": true,
+  "displayBattMonitor": true,
+  "displayCAN": true,
+  "displayCompassMotorCalib": true,
+  "displayRangeFinder": true,
+  "displayAirSpeed": true,
+  "displayPx4Flow": true,
+  "displayOpticalFlow": true,
+  "displayOsd": true,
+  "displayCameraGimbal": true,
+  "displayMotorTest": true,
+  "displayBluetooth": true,
+  "displayParachute": true,
+  "displayEsp": true,
+  "displayAntennaTracker": true,
+  "displayBasicTuning": true,
+  "displayExtendedTuning": true,
+  "displayStandardParams": true,
+  "displayAdvancedParams": true,
+  "displayFullParamList": true,
+  "displayFullParamTree": true,
+  "displayParamCommitButton": false,
+  "displayBaudCMB": true,
+  "displaySerialPortCMB": true,
+  "standardFlightModesOnly": false,
+  "autoHideMenuForce": false,
+  "displayInitialParams": true,
+  "isAdvancedMode": true,
+  "displayServoOutput": true,
+  "displayJoystick": true,
+  "displayOSD": true,
+  "displayUserParam": true,
+  "displayPlannerSettings": true,
+  "displayFFTSetup": true,
+  "displayPreFlightTabEdit": true,
+  "displayPlannerLayout": true,
+  "lockQuickView": false
+}</displayview>
+  <FlightSplitter>300</FlightSplitter>
+  <FPaltmode>3</FPaltmode>
+  <fw_check>11/11/2024</fw_check>
+  <groundColorToolStripMenuItem>False</groundColorToolStripMenuItem>
+  <guid>b7826ff8-8746-441a-b1a0-bf9f91a79dbf</guid>
+  <kindex>3</kindex>
+  <kindexdate>11/11/2024</kindexdate>
+  <logdirectory>/root/.local/share/Mission Planner/logs</logdirectory>
+  <MainHeight>604</MainHeight>
+  <MainLocX>594</MainLocX>
+  <MainLocY>154</MainLocY>
+  <MainMaximised>Normal</MainMaximised>
+  <MainWidth>1109</MainWidth>
+  <maplast_lat>31.4993847</maplast_lat>
+  <maplast_lng>34.8041511</maplast_lng>
+  <maplast_zoom>17</maplast_zoom>
+  <MapType>GoogleSatelliteMap</MapType>
+  <menu_autohide>false</menu_autohide>
+  <Params_BG>True</Params_BG>
+  <severity>4</severity>
+  <SHOWAGAIN_New_Firmware_Copter_4_5_7>False</SHOWAGAIN_New_Firmware_Copter_4_5_7>
+  <tabcontrolactions>tabQuick;tabActions;tabPagemessages;tabPagePreFlight;tabGauges;tabTransponder;tabStatus;tabServo;tabAuxFunction;tabScripts;tabPayload;tabTLogs;tablogbrowse;</tabcontrolactions>
+  <terminaltheming>True</terminaltheming>
+  <theme>BurntKermit.mpsystheme</theme>
+  <Tuning_Graph_Selected>roll|pitch|nav_roll|nav_pitch|</Tuning_Graph_Selected>
+  <UDP_BAUD>115200</UDP_BAUD>
+  <update_check>11/11/2024</update_check>
+</Config>
