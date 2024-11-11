@@ -4,7 +4,23 @@ set -e
 vscode_commit="$1"
 install_dir=/home/$USERNAME/.vscode-server/bin/$vscode_commit
 
-wget -q --no-check-certificate https://update.code.visualstudio.com/commit:$vscode_commit/server-linux-x64/stable -O /tmp/vscode_server.tar.gz
+case $(uname -m) in
+
+  aarch64)
+    arch=arm64
+    ;;
+
+  x86_64)
+    arch=x64
+    ;;
+
+  *)
+    echo "unknown arch: $(uname -m)"
+    exit 1
+    ;;
+esac
+
+wget -q --no-check-certificate https://update.code.visualstudio.com/commit:$vscode_commit/server-linux-${arch}/stable -O /tmp/vscode_server.tar.gz
 mkdir -p $install_dir
 tar --strip 1 -zxvf /tmp/vscode_server.tar.gz -C $install_dir
 touch $install_dir/0

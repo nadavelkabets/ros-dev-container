@@ -9,14 +9,24 @@ fi
 sudo apt install -y docker.io docker-compose
 # enable user to access docker without sudo
 sudo usermod -aG docker $USER
-wget https://update.code.visualstudio.com/commit:0ee08df0cf4527e40edc9aa28f4b5bd38bbff2b2/linux-x64/stable -O ~/Downloads/vscode.tar.gz
-mkdir -p ~/.code
-if [ -d "~/.code" ]; then
-  sudo rm -r ~/.code
-fi
-tar --strip 1 -zxvf ~/Downloads/vscode.tar.gz -C ~/.code
-sudo rm /usr/bin/code
-sudo ln -s ~/.code/bin/code /usr/bin/code
-rm ~/Downloads/vscode.tar.gz
+
+case $(uname -m) in
+
+  aarch64)
+    arch=arm64
+    ;;
+
+  x86_64)
+    arch=x64
+    ;;
+
+  *)
+    echo "unknown arch: $(uname -m)"
+    exit 1
+    ;;
+esac
+
+wget https://update.code.visualstudio.com/commit:0ee08df0cf4527e40edc9aa28f4b5bd38bbff2b2/linux-deb-${arch}/stable -O ~/Downloads/vscode.deb
+sudo apt install ~/Downloads/vscode.deb
 
 echo "Reboot for docker to work correctly"
