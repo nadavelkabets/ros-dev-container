@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-if [ $EUID == 0]; then
+if [ $EUID == 0 ]; then
   echo "You must run this script without sudo permissions"
   exit 1
 fi
@@ -27,7 +27,9 @@ case $(uname -m) in
 esac
 
 wget https://update.code.visualstudio.com/commit:0ee08df0cf4527e40edc9aa28f4b5bd38bbff2b2/linux-deb-${arch}/stable -O ~/Downloads/vscode.deb
-sudo apt install ~/Downloads/vscode.deb
+cd ~/Downloads
+sudo apt install -y --allow-downgrades ./vscode.deb
 code --install-extension ms-vscode-remote.remote-containers
+cd -
 
 echo "Reboot for docker to work correctly"
