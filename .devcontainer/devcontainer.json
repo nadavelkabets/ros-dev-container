@@ -3,7 +3,7 @@
     "../docker/compose/dev_container/docker-compose.yml"
   ],
   "service": "development_environment",
-  "workspaceFolder": "/workspace",
+  "workspaceFolder": "/home/user/workspace",
   "containerUser": "user",
   "customizations": {
     "vscode": {

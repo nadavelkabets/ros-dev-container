@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 
 . /opt/ros/humble/setup.sh
-workspace_dir="/workspace"
+workspace_dir="/home/user/workspace"
 workspace_setup_script="${workspace_dir}/install/setup.sh"
 
 if [ ! -f ${workspace_setup_script} ] && [ "$(find $workspace_dir) -name package.xml)" != "" ]; then
