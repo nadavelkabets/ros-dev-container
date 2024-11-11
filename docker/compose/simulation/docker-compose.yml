@@ -2,7 +2,9 @@ version: "3.3"
 
 services:
   sitl:
-    image: sitl:latest
+    build:
+      context: ${PWD}
+      dockerfile: docker/dockerfiles/sitl.dockerfile
     container_name: sitl
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
@@ -29,7 +31,9 @@ services:
       - dev
 
   mission_planner:
-    image: mp:1.3.80
+    build:
+      context: ${PWD}
+      dockerfile: docker/dockerfiles/mission_planner.dockerfile
     container_name: mission_planner
     environment: 
       - DISPLAY=${DISPLAY}
