@@ -4,7 +4,7 @@ set +e
 
 # multicast support for cyclonedds
 sudo ip link set lo multicast on
-tmux new-session -d -t simulation
+tmux new-session -d -s simulation '/bin/bash'
 tmux source-file ./.tmux.conf
 
 tmux_window() {
