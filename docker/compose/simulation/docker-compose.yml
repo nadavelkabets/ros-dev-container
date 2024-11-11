@@ -22,8 +22,7 @@ services:
         "--map",
         "--console",
         "--no-rebuild",
-        "--no-extra-ports",
-        "--out=mission_planner:14550",
+        "--no-mavproxy",
         "-l",
         "31.4993848,34.8041511,0,0"
       ]
@@ -40,6 +39,15 @@ services:
     privileged: true
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
+    networks:
+      - dev
+
+  mavros:
+    build:
+      context: ${PWD}
+      dockerfile: docker/dockerfiles/mavros.dockerfile
+    container_name: mavros
+    command: ["--ros-args", "-p", "fcu_url:=tcp://sitl:5760/", "-p", "gcs_url:=udp://@mission_planner:14550/"]
     networks:
       - dev
 

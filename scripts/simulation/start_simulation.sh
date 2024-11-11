@@ -18,4 +18,5 @@ tmux_window() {
 
 tmux_window "mission_planner" "docker-compose -f docker/compose/simulation/docker-compose.yml up mission_planner"
 tmux_window "sitl" "docker-compose -f docker/compose/simulation/docker-compose.yml up sitl"
+tmux_window "mavros" "docker-compose -f docker/compose/simulation/docker-compose.yml up mavros"
 tmux attach-session -t simulation
