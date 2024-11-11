@@ -5,10 +5,10 @@ workspace_dir="/workspace"
 workspace_setup_script="${workspace_dir}/install/setup.sh"
 
 if [ ! -f ${workspace_setup_script} ] && [ "$(find $workspace_dir) -name package.xml)" != "" ]; then
-  pushd $workspace_dir
+  cd $workspace_dir
   echo "Building with colcon"
   colcon build --symlink-install
-  popd
+  cd -
 fi
 
 if [ -f $workspace_setup_script ]; then
