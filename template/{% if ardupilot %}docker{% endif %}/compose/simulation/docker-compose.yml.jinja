@@ -1,0 +1,55 @@
+{%- set ardupilot_minor = ardupilot_version.split('.')[1] | int -%}
+{%- set ubuntu_version = '20.04' if ardupilot_minor < 4 else ('22.04' if ardupilot_minor < 6 else '24.04') -%}
+name: {{ project_slug }}
+
+services:
+  sitl:
+    build:
+      context: ../../..
+      dockerfile: docker/dockerfiles/sitl.Dockerfile
+      # The ArduPilot to build; a fork's repository and branch work too. Not master: its SITL ignores the gazebo-iris
+      # frame's default parameters, so the vehicle can't arm in Gazebo. TAG is the image's Ubuntu release, which has to
+      # be one this ArduPilot version supports: 20.04 before Copter 4.4, 22.04 for 4.4 and 4.5, 24.04 from 4.6.
+      args:
+        ARDUPILOT_REPO: https://github.com/ArduPilot/ardupilot.git
+        ARDUPILOT_VERSION: Copter-{{ ardupilot_version }}
+        TAG: "{{ ubuntu_version }}"
+    stdin_open: true
+    tty: true
+    command:
+      - sim_vehicle.py
+      - -v
+      - ArduCopter
+      - --no-rebuild
+      - --no-mavproxy
+    networks:
+      - dev
+
+  mission-planner:
+    build:
+      context: ../../..
+      dockerfile: docker/dockerfiles/mission_planner.Dockerfile
+    environment:
+      - DISPLAY=${DISPLAY}
+    privileged: true
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    networks:
+      - dev
+
+  mavros:
+    build:
+      context: ../../..
+      dockerfile: docker/dockerfiles/mavros.Dockerfile
+    command:
+      - --ros-args
+      - -p
+      - fcu_url:=tcp://sitl:5760/
+      - -p
+      - gcs_url:=udp://@mission-planner:14550/
+    networks:
+      - dev
+
+networks:
+  dev:
+    driver: bridge

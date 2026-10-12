@@ -1,0 +1,83 @@
+# Runs on every commit once installed (the dev container does that), or on demand with `just lint`.
+# Bump the pinned versions with `pre-commit autoupdate`.
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-case-conflict
+      - id: check-executables-have-shebangs
+      - id: check-json
+        exclude: ^\.devcontainer/devcontainer\.json$  # JSON with comments, which the spec allows
+      - id: check-merge-conflict
+      - id: check-shebang-scripts-are-executable
+      - id: check-symlinks
+      - id: check-toml
+      - id: check-xml
+      - id: check-yaml
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: trailing-whitespace
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.3
+    hooks:
+      - id: codespell
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.17.0
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+      - id: ruff-format
+
+  # Settings, including the interpreter whose packages (ROS included) it checks against, are in mypy.ini
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v2.4.0
+    hooks:
+      - id: mypy
+
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.11.0.1-1
+    hooks:
+      - id: shellcheck
+
+  # Formatting options (Google shell style) are in .editorconfig
+  - repo: https://github.com/MaxWinterstein/shfmt-py
+    rev: v4.2.0
+    hooks:
+      - id: shfmt
+
+  - repo: https://github.com/AleksaC/hadolint-py
+    rev: v2.15.1
+    hooks:
+      - id: hadolint
+
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.38.0
+    hooks:
+      - id: yamllint
+        args: [--strict]
+        exclude: ^\.copier-answers\.yml$  # written by copier
+
+  - repo: https://github.com/Mateusz-Grzelinski/actionlint-py
+    rev: v1.7.12.25
+    hooks:
+      - id: actionlint
+
+  - repo: https://github.com/tombi-toml/tombi-pre-commit
+    rev: v1.8.1
+    hooks:
+      - id: tombi-format
+      - id: tombi-lint
+
+  - repo: local
+    hooks:
+      - id: just-fmt
+        name: just --fmt
+        language: python
+        additional_dependencies: [rust-just==1.58.0]
+        entry: bash -c 'for justfile in "$@"; do just --fmt --check --justfile "${justfile}" || exit 1; done' --
+        files: (^|/)(justfile|[^/]+\.just)$

@@ -1,0 +1,19 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  dev-container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # Runs in the same dev container used for development, so the tools and the ROS environment match
+      - name: Lint, build and test
+        uses: devcontainers/ci@v0.3
+        with:
+          push: never
+          runCmd: just lint && just build && just test

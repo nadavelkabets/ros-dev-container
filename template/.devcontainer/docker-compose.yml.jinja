@@ -1,0 +1,35 @@
+name: {{ project_slug }}
+
+services:
+  development-environment:
+    build: .
+    environment:
+      - DISPLAY=${DISPLAY}
+{%- if ardupilot %}
+      - MAVLINK_DIALECT=ardupilotmega
+      - MAVLINK20=1
+{%- endif %}
+{%- if claude_code %}
+      - CLAUDE_CONFIG_DIR=/home/user/.claude
+{%- endif %}
+    volumes:
+      - ..:/home/user/workspace
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - pre-commit-cache:/home/user/.cache/pre-commit
+{%- if claude_code %}
+      # Claude Code auth, settings and history survive container rebuilds
+      - claude-config:/home/user/.claude
+{%- endif %}
+    hostname: dev-env
+    networks:
+      - dev
+
+networks:
+  dev:
+    driver: bridge
+
+volumes:
+  pre-commit-cache:
+{%- if claude_code %}
+  claude-config:
+{%- endif %}

@@ -1,0 +1,30 @@
+{%- set gz_version = {"jazzy": "harmonic", "kilted": "ionic", "lyrical": "jetty", "rolling": "jetty"}[ros_distro] -%}
+# Gazebo with the ardupilot_gazebo plugin. ArduPilot SITL runs in its own image (sitl.Dockerfile), and the two talk
+# over the network they share. The ros image's entrypoint loads ROS, which provides Gazebo, and it runs as root, so
+# Gazebo can open the host's GPU device nodes whichever group owns them.
+FROM ros:{{ ros_distro }}-ros-base
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+ARG DEBIAN_FRONTEND=noninteractive
+
+# Gazebo comes from ROS's vendor packages, so it's the version paired with this ROS distribution. The upgrade keeps
+# the base image's ROS packages in step with the ones installed here (ROS releases them in syncs).
+RUN apt-get update && apt-get dist-upgrade -y && apt-get install -y \
+    git \
+    gstreamer1.0-gl \
+    gstreamer1.0-libav \
+    gstreamer1.0-plugins-bad \
+    libgstreamer-plugins-base1.0-dev \
+    libgstreamer1.0-dev \
+    libopencv-dev \
+    rapidjson-dev \
+    ros-{{ ros_distro }}-ros-gz
+
+# The plugin is built against the vendored Gazebo libraries
+ENV GZ_VERSION={{ gz_version }}
+RUN git clone --depth 1 https://github.com/ArduPilot/ardupilot_gazebo.git /opt/ardupilot_gazebo \
+    && . "/opt/ros/$ROS_DISTRO/setup.bash" \
+    && cmake -S /opt/ardupilot_gazebo -B /opt/ardupilot_gazebo/build -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+    && cmake --build /opt/ardupilot_gazebo/build -j"$(nproc)"
+ENV GZ_SIM_SYSTEM_PLUGIN_PATH=/opt/ardupilot_gazebo/build
+ENV GZ_SIM_RESOURCE_PATH=/opt/ardupilot_gazebo/models:/opt/ardupilot_gazebo/worlds
