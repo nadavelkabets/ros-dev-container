@@ -1,0 +1,65 @@
+FROM ros:{{ ros_distro }}-ros-base
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+ARG USER_NAME=user
+ARG USER_UID=1000
+# Ubuntu 24.04+ base images ship an "ubuntu" user that already owns UID 1000
+RUN if id ubuntu >/dev/null 2>&1; then userdel --remove ubuntu; fi \
+    && groupadd --gid "$USER_UID" "$USER_NAME" \
+    && useradd --uid "$USER_UID" --gid "$USER_UID" --create-home --shell /bin/bash "$USER_NAME" \
+    && echo "$USER_NAME ALL=(root) NOPASSWD:ALL" > "/etc/sudoers.d/$USER_NAME" \
+    && chmod 0440 "/etc/sudoers.d/$USER_NAME"
+
+# Keep downloaded packages in a BuildKit cache (the RUN --mount below), so rebuilds don't download them again.
+# The package lists stay in the image, so rosdep can install packages without an apt-get update first.
+RUN rm -f /etc/apt/apt.conf.d/docker-clean \
+    && echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
+{% if ros2_testing %}
+# Pull ROS packages from the ros2-testing repository (newer, less tested)
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    apt-get update && apt-get install -y ros2-testing-apt-source
+{% endif %}
+# The upgrade keeps the base image's ROS packages in step with the ones installed here (ROS releases them in syncs)
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    apt-get update && apt-get dist-upgrade -y && apt-get install -y \
+    bash-completion \
+    curl \
+{%- if docker_access %}
+    docker-buildx \
+    docker-compose-v2 \
+    docker.io \
+{%- endif %}
+    git \
+    htop \
+    iputils-ping \
+    less \
+    openssh-client \
+    python3-pip \
+    ros-dev-tools \
+    rsync \
+    tmux \
+    unzip \
+    vim \
+    wget \
+    x11-xserver-utils
+
+COPY --from=ghcr.io/astral-sh/uv:0.13.0 /uv /uvx /usr/local/bin/
+# uv's cache and the workspace .venv live on different filesystems, so hardlinking always fails
+ENV UV_LINK_MODE=copy
+
+COPY scripts/dev_container/bashrc.sh /usr/local/share/dev_container/bashrc.sh
+
+USER $USER_NAME
+ENV PATH="/home/$USER_NAME/.local/bin:$PATH"
+RUN uv tool install pre-commit --with pre-commit-uv \
+    && uv tool install rust-just \
+    && mkdir -p ~/.cache/pre-commit
+{% if claude_code %}
+# ~/.claude must exist in the image so its named volume is created with the user's ownership
+RUN curl -fsSL https://claude.ai/install.sh | bash \
+    && mkdir -p ~/.claude
+{% endif %}
+RUN echo ". /usr/local/share/dev_container/bashrc.sh" >> ~/.bashrc
+
+WORKDIR /home/$USER_NAME

@@ -1,0 +1,47 @@
+name: {{ project_slug }}
+
+services:
+  development_environment:
+    build:
+      context: ../../..
+      dockerfile: docker/dockerfiles/dev_container.dockerfile
+    environment:
+      - DISPLAY=${DISPLAY}
+{%- if ardupilot %}
+      - MAVLINK_DIALECT=ardupilotmega
+      - MAVLINK20=1
+{%- endif %}
+{%- if claude_code %}
+      - CLAUDE_CONFIG_DIR=/home/user/.claude
+{%- endif %}
+{%- if docker_access %}
+    # Grants access to the host's docker socket. DOCKER_GID is written to .env next to this file by
+    # scripts/dev_container/initialize.sh, which runs on the host before the container starts.
+    group_add:
+      - "${DOCKER_GID:-0}"
+{%- endif %}
+    command: sleep infinity
+    volumes:
+      - ../../..:/home/user/workspace
+      - /tmp/.X11-unix:/tmp/.X11-unix
+{%- if docker_access %}
+      - /var/run/docker.sock:/var/run/docker.sock
+{%- endif %}
+      - pre-commit-cache:/home/user/.cache/pre-commit
+{%- if claude_code %}
+      # Claude Code auth, settings and history survive container rebuilds
+      - claude-config:/home/user/.claude
+{%- endif %}
+    hostname: dev_env
+    networks:
+      - dev
+
+networks:
+  dev:
+    driver: bridge
+
+volumes:
+  pre-commit-cache:
+{%- if claude_code %}
+  claude-config:
+{%- endif %}

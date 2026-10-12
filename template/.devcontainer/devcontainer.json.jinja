@@ -1,0 +1,68 @@
+{%- set extensions = [
+  "charliermarsh.ruff",
+  "editorconfig.editorconfig",
+  "ms-python.mypy-type-checker",
+  "ms-python.python",
+  "ms-python.vscode-pylance",
+  "ranch-hand-robotics.rde-pack",
+  "timonwong.shellcheck",
+] + vscode_extensions + (["anthropic.claude-code"] if claude_code else []) -%}
+{
+  "name": "{{ project_name }}",
+  "dockerComposeFile": [
+    "../docker/compose/dev_container/docker-compose.yml"
+  ],
+  "service": "development_environment",
+  "workspaceFolder": "/home/user/workspace",
+  "containerUser": "user",
+{%- if docker_access %}
+  // Runs on the host: hands the docker socket's group id to docker compose
+  "initializeCommand": "./scripts/dev_container/initialize.sh",
+{%- endif %}
+  // VS Code takes its environment (ROS, the workspace overlay, the uv venv) from ~/.bashrc through this probe
+  "userEnvProbe": "loginInteractiveShell",
+  // Runs before VS Code connects, so the probe already sees the built workspace
+  "onCreateCommand": "./scripts/dev_container/on_create.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+{%- for extension in extensions %}
+        "{{ extension }}"{{ "," if not loop.last }}
+{%- endfor %}
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "/bin/bash"
+          }
+        },
+        "python.defaultInterpreterPath": "{{ '/home/user/workspace/.venv/bin/python' if uv_venv else '/usr/bin/python3' }}",
+        "python.terminal.useEnvFile": true,
+        "python.testing.unittestEnabled": false,
+        "python.testing.pytestEnabled": true,
+        "python.analysis.autoImportCompletions": true,
+        // Pylance already finds ROS through the environment. When these are empty, the ROS extension writes a snapshot
+        // of PYTHONPATH into .vscode/settings.json, which goes stale. The workspace root is a harmless non-empty value.
+        "python.analysis.extraPaths": ["${workspaceFolder}"],
+        "python.autoComplete.extraPaths": ["${workspaceFolder}"],
+{%- if "ms-vscode.cpptools-extension-pack" in vscode_extensions %}
+        // colcon merges each package's compile commands into this file (just build exports them)
+        "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json",
+{%- endif %}
+        "[python]": {
+          "editor.defaultFormatter": "charliermarsh.ruff"
+        },
+        "files.exclude": {
+          "**/__pycache__": true,
+          "**/.pytest_cache": true,
+          "**/.mypy_cache": true,
+          "**/.ruff_cache": true
+        },
+        "files.autoSaveDelay": 300,
+        "files.autoSave": "afterDelay",
+        "files.insertFinalNewline": true
+      }
+    }
+  }
+}

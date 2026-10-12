@@ -1,0 +1,9 @@
+# Start the simulation containers and follow their logs in a tmux session
+[group('sim')]
+sim-start:
+    ./scripts/simulation/start_simulation.sh
+
+# Stop the simulation containers and the tmux session
+[group('sim')]
+sim-kill:
+    ./scripts/simulation/kill_simulation.sh

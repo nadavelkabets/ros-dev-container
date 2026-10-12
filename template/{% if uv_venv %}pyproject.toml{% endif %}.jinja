@@ -1,0 +1,12 @@
+# Python dependencies that aren't available as ROS or apt packages.
+# They're installed into .venv, which also sees the ROS Python packages (--system-site-packages).
+# Add one with `uv add <package>`.
+[project]
+name = "{{ project_slug }}"
+version = "0.0.0"
+requires-python = ">=3.10"
+dependencies = []
+
+[tool.uv]
+package = false
+python-preference = "only-system"

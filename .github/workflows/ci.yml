@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
+      - name: Lint the template repository
+        run: uvx --with pre-commit-uv pre-commit run --all-files --show-diff-on-failure
+
+  generated-project:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: defaults (jazzy)
+            data: ""
+          - name: minimal (humble)
+            data: --data ros_distro=humble --data claude_code=false --data 'vscode_extensions=[]'
+          - name: all options (lyrical)
+            data: >-
+              --data ros_distro=lyrical --data ros2_testing=true --data ardupilot=true
+              --data uv_venv=true --data ci=true
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@v10
+
+      - name: Generate a project
+        run: |
+          uvx copier copy --vcs-ref HEAD --defaults ${{ matrix.data }} . generated
+          git -C generated init -q
+          git -C generated add -A
+
+      # Lints the fresh project, then adds a ROS package and builds and tests it, inside its dev container
+      - name: Lint, build and test in the dev container
+        uses: devcontainers/ci@v0.3
+        with:
+          subFolder: generated
+          push: never
+          runCmd: >-
+            just lint
+            && ros2 pkg create --build-type ament_python --node-name demo_node --destination-directory src demo_pkg
+            && just build
+            && just test

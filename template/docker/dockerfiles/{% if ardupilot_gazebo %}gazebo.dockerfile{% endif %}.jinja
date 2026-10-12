@@ -1,0 +1,52 @@
+{%- set gz_version = {"jazzy": "harmonic", "kilted": "ionic", "lyrical": "jetty", "rolling": "jetty"}[ros_distro] -%}
+# Gazebo with the ardupilot_gazebo plugin, and ArduPilot SITL. The gazebo and sitl services both run this image.
+FROM ros:{{ ros_distro }}-ros-base
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+ARG DEBIAN_FRONTEND=noninteractive
+
+# Gazebo comes from ROS's vendor packages, so it's the version paired with this ROS distribution
+RUN apt-get update && apt-get install -y \
+    git \
+    gstreamer1.0-gl \
+    gstreamer1.0-libav \
+    gstreamer1.0-plugins-bad \
+    libgstreamer-plugins-base1.0-dev \
+    libgstreamer1.0-dev \
+    libopencv-dev \
+    lsb-release \
+    rapidjson-dev \
+    ros-{{ ros_distro }}-ros-gz \
+    sudo
+
+ARG USER_NAME=ardupilot
+ARG USER_UID=1000
+# Ubuntu 24.04+ base images ship an "ubuntu" user that already owns UID 1000
+RUN if id ubuntu >/dev/null 2>&1; then userdel --remove ubuntu; fi \
+    && useradd --uid "$USER_UID" --create-home --shell /bin/bash "$USER_NAME" \
+    && echo "$USER_NAME ALL=(root) NOPASSWD:ALL" > "/etc/sudoers.d/$USER_NAME" \
+    && chmod 0440 "/etc/sudoers.d/$USER_NAME"
+
+COPY scripts/simulation/gazebo_entrypoint.sh /gazebo_entrypoint.sh
+
+USER $USER_NAME
+WORKDIR /home/$USER_NAME
+
+# ArduPilot SITL
+RUN git clone --depth 1 --recurse-submodules --shallow-submodules https://github.com/ArduPilot/ardupilot.git
+WORKDIR /home/$USER_NAME/ardupilot
+RUN SKIP_AP_EXT_ENV=1 SKIP_AP_GRAPHIC_ENV=1 SKIP_AP_COV_ENV=1 SKIP_AP_GIT_CHECK=1 \
+    Tools/environment_install/install-prereqs-ubuntu.sh -y
+RUN . ~/.ardupilot_env && ./waf configure --board sitl && ./waf copter
+
+# ardupilot_gazebo plugin, built against the vendored Gazebo libraries
+WORKDIR /home/$USER_NAME
+ENV GZ_VERSION={{ gz_version }}
+RUN git clone --depth 1 https://github.com/ArduPilot/ardupilot_gazebo.git \
+    && . "/opt/ros/$ROS_DISTRO/setup.bash" \
+    && cmake -S ardupilot_gazebo -B ardupilot_gazebo/build -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+    && cmake --build ardupilot_gazebo/build -j"$(nproc)"
+ENV GZ_SIM_SYSTEM_PLUGIN_PATH=/home/$USER_NAME/ardupilot_gazebo/build
+ENV GZ_SIM_RESOURCE_PATH=/home/$USER_NAME/ardupilot_gazebo/models:/home/$USER_NAME/ardupilot_gazebo/worlds
+
+ENTRYPOINT ["/gazebo_entrypoint.sh"]
