@@ -1,6 +1,7 @@
 {%- set gz_version = {"jazzy": "harmonic", "kilted": "ionic", "lyrical": "jetty", "rolling": "jetty"}[ros_distro] -%}
 # Gazebo with the ardupilot_gazebo plugin. ArduPilot SITL runs in its own image (sitl.Dockerfile), and the two talk
-# over the network they share.
+# over the network they share. The ros image's entrypoint loads ROS, which provides Gazebo, and it runs as root, so
+# Gazebo can open the host's GPU device nodes whichever group owns them.
 FROM ros:{{ ros_distro }}-ros-base
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -27,7 +28,3 @@ RUN git clone --depth 1 https://github.com/ArduPilot/ardupilot_gazebo.git /opt/a
     && cmake --build /opt/ardupilot_gazebo/build -j"$(nproc)"
 ENV GZ_SIM_SYSTEM_PLUGIN_PATH=/opt/ardupilot_gazebo/build
 ENV GZ_SIM_RESOURCE_PATH=/opt/ardupilot_gazebo/models:/opt/ardupilot_gazebo/worlds
-
-# Runs as root, like the ros base image, so Gazebo can open the host's GPU device nodes whichever group owns them
-COPY scripts/simulation/gazebo_entrypoint.sh /gazebo_entrypoint.sh
-ENTRYPOINT ["/gazebo_entrypoint.sh"]

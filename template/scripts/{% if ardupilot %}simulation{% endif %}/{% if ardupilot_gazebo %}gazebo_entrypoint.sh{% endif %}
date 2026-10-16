@@ -1,7 +1,0 @@
-#!/bin/bash
-# Entrypoint of the gazebo container: loads ROS, which provides Gazebo
-set -e
-
-# shellcheck source=/dev/null
-source "/opt/ros/${ROS_DISTRO}/setup.bash"
-exec "$@"

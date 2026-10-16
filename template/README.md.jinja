@@ -78,7 +78,8 @@ volume, so they survive container rebuilds. Your host `~/.claude` isn't shared w
 
 `just sim-start` starts the simulation containers from inside the dev container and opens a tmux window with each
 one's logs; `just sim-kill` stops them. ArduPilot SITL (Copter {{ ardupilot_version }}) simulates the vehicle with its
-built-in physics, MAVROS connects to it, and forwards MAVLink to Mission Planner.
+built-in physics, MAVROS connects to it, and forwards MAVLink to Mission Planner. To build another ArduPilot version
+or a fork, change the `sitl` service's build args in `docker/compose/simulation/docker-compose.yml`.
 {%- if ardupilot_gazebo %}
 
 `just sim-gazebo-start` starts the same containers with SITL flying in Gazebo through the
