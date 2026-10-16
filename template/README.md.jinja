@@ -50,7 +50,11 @@ Commits made outside the container need `pre-commit` installed on the host.
 - General: codespell, whitespace, file endings, JSON, XML and merge-conflict checks
 
 Tool settings are in `pyproject.toml` (ruff, mypy, codespell and tombi), `.yamllint.yaml`, `.hadolint.yaml` and
-`.editorconfig`, the three tools that can't read it. They all allow lines of up to 120 characters.
+`.editorconfig`, the three tools that can't read it. They all allow lines of up to 120 characters. mypy runs in strict
+mode, like `ament_mypy --ament-strict`, which rclpy uses. Imports of packages without type information fail until
+the package is added to the `[[tool.mypy.overrides]]` list in `pyproject.toml`. The files `ros2 pkg create` generates
+(`setup.py` and the ament linter tests) aren't type-checked, but on Jazzy and older the node's `main()` it generates
+needs `-> None`.
 Packages that declare ament linter tests (`ament_lint_auto`) still run them as part of `just test`.
 {%- if uv_venv %}
 
