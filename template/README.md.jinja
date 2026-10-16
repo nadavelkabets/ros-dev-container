@@ -1,0 +1,135 @@
+# {{ project_name }}
+
+A ROS 2 {{ ros_distro }} development environment in a VS Code dev container
+{%- if ardupilot %}, with an ArduPilot simulation (Mission Planner, SITL and MAVROS){% endif %}.
+
+## Get started
+
+```bash
+./scripts/setup_dev_env.sh
+sudo reboot
+code .
+```
+
+When VS Code finishes loading, click **Reopen in Container** in the bottom right corner.
+
+Put your ROS packages under `src/`. When the container is created, the workspace is built automatically if it has
+packages and hasn't been built yet. apt's package lists are fetched too, so `sudo apt install` works without an update
+first and package names tab-complete.
+
+`~/.bashrc` in the container sources ROS{% if uv_venv %}, the uv venv{% endif %} and the workspace overlay
+(`install/setup.bash`). VS Code takes its environment from it when it connects, so extensions see the same
+environment as the terminal. It does that before the setup above, so run **Developer: Reload Window** once the
+container is created or rebuilt, and again after building new packages.
+
+## Commands
+
+The recipes are in `justfile` and `just/`; run `just` to list them.
+
+| Command          | Description                                                     |
+| ---------------- | --------------------------------------------------------------- |
+| `just deps`      | Install the dependencies of the packages in `src/` with rosdep |
+| `just build`     | Build the workspace with colcon                                 |
+| `just test`      | Run the workspace tests                                         |
+| `just clean`     | Remove `build/`, `install/` and `log/`                          |
+| `just lint`      | Run all linters on all files                                    |
+{%- if ardupilot %}
+| `just sim-start` | Start the simulation and follow its logs in a tmux session      |
+| `just sim-kill`  | Stop the simulation                                             |
+{%- endif %}
+
+## Linting
+
+Linters run through [pre-commit](https://pre-commit.com), which pins each tool's version in
+`.pre-commit-config.yaml`. The dev container installs the git hook, so they run on every commit made inside it.
+Commits made outside the container need `pre-commit` installed on the host.
+
+- Python: ruff (lint and format), mypy
+- Shell: shellcheck, shfmt
+- Dockerfiles: hadolint
+- YAML: yamllint; GitHub workflows: actionlint; TOML: tombi; justfiles: `just --fmt`
+- General: codespell, whitespace, file endings, JSON, XML and merge-conflict checks
+
+Tool settings are in `pyproject.toml` (ruff, mypy, codespell and tombi), `.yamllint.yaml`, `.hadolint.yaml` and
+`.editorconfig`, the three tools that can't read it. They all allow lines of up to 120 characters. mypy runs in strict
+mode, like `ament_mypy --ament-strict`, which rclpy uses. Imports of packages without type information fail until
+the package is added to the `[[tool.mypy.overrides]]` list in `pyproject.toml`. The files `ros2 pkg create` generates
+(`setup.py` and the ament linter tests) aren't type-checked, but on Jazzy and older the node's `main()` it generates
+needs `-> None`.
+Packages that declare ament linter tests (`ament_lint_auto`) still run them as part of `just test`.
+{%- if uv_venv %}
+
+## Python dependencies
+
+Python packages that aren't available through rosdep go in `pyproject.toml`, and `uv add <package>` adds one. uv
+installs them into `.venv`, which is created with `--system-site-packages` so the ROS Python packages stay
+importable. Terminals activate it automatically, and both `just build` and `colcon` in a terminal run colcon from it,
+so the nodes' entry points use the venv's interpreter.
+
+- A package in `pyproject.toml` that's also installed through apt (`numpy`, for example) takes precedence over the apt
+  version in the venv. ROS packages that your nodes import were built against the apt version, and can break.
+- rosdep keys that resolve to pip packages are installed with the system pip, not into the venv. Add those with
+  `uv add` instead.
+{%- endif %}
+{%- if claude_code %}
+
+## Claude Code
+
+Claude Code is installed in the container. Its authentication and settings are kept in the `claude-config` docker
+volume, so they survive container rebuilds. Your host `~/.claude` isn't shared with the container.
+{%- endif %}
+{%- if ardupilot %}
+
+## Simulation
+
+`just sim-start` starts the simulation containers from inside the dev container and opens a tmux window with each
+one's logs; `just sim-kill` stops them. ArduPilot SITL (Copter {{ ardupilot_version }}) simulates the vehicle with its
+built-in physics, MAVROS connects to it, and forwards MAVLink to Mission Planner. To build another ArduPilot version
+or a fork, change the `sitl` service's build args in `docker/compose/simulation/docker-compose.yml`.
+{%- if ardupilot_gazebo %}
+
+`just sim-gazebo-start` starts the same containers with SITL flying in Gazebo through the
+[ardupilot_gazebo](https://github.com/ArduPilot/ardupilot_gazebo) plugin (the `iris_runway.sdf` world), by layering
+`docker/compose/simulation/docker-compose.gazebo.yml` on `docker-compose.yml`. The `gazebo` and `sitl` containers share
+a network, so the plugin and SITL talk over 127.0.0.1.
+{%- endif %}
+{%- if gazebo_vm_rendering %}
+
+Gazebo renders through the host's `/dev/dri`, for VMs such as VMware Fusion or Parallels on Apple Silicon. The GUI
+uses Ogre 1, since Ogre 2 doesn't work there, while the server stays on Ogre 2 for sensors such as `gpu_lidar`, which
+return only `range_min` on Ogre 1. `MESA_EXTENSION_OVERRIDE` turns off an OpenGL extension that VMware's driver
+mishandles, which would otherwise leave those sensors with only every third frame.
+{%- endif %}
+{%- endif %}
+{%- if docker_access %}
+
+## Docker inside the container
+
+The container uses the host's docker daemon through its socket (docker-outside-of-docker), which gives it
+root-equivalent access to the host. The
+[docker-outside-of-docker](https://github.com/devcontainers/features/tree/main/src/docker-outside-of-docker) dev
+container feature installs the docker CLI and gives the container user access to the socket.
+
+Containers started from inside run next to the dev container on the host, so paths in `docker run -v` and compose
+bind mounts refer to host paths, not container paths. Relative paths resolve to `/home/user/workspace`, which doesn't
+exist on the host. Build them from `$LOCAL_WORKSPACE_FOLDER`, the workspace's path on the host, instead:
+
+```yaml
+volumes:
+  - ${LOCAL_WORKSPACE_FOLDER}/config/params.yaml:/config/params.yaml
+```
+{%- endif %}
+
+## Git over SSH
+
+VS Code forwards your host's SSH agent into the container, so git over SSH works without mounting `~/.ssh`. Load your
+key into the agent on the host first (`ssh-add -l` lists the loaded keys).
+
+## Updating
+
+This project was generated from a [Copier](https://copier.readthedocs.io) template. To pull in template changes, or to
+change an answer such as the ROS distribution, run:
+
+```bash
+copier update
+```

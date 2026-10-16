@@ -1,0 +1,98 @@
+{#- Core ROS packages that ship without type information on this release, for mypy's untyped list below #}
+{%- set untyped = (["launch.*"] if ros_distro in ["humble", "jazzy"] else [])
+  + (["launch_ros.*", "rclpy.*"] if ros_distro == "humble" else []) -%}
+# Settings for the linters and formatters in .pre-commit-config.yaml. yamllint, hadolint and EditorConfig can't read
+# this file, so they have their own (.yamllint.yaml, .hadolint.yaml and .editorconfig).
+{%- if uv_venv %}
+
+# Python dependencies that aren't available as ROS or apt packages.
+# They're installed into .venv, which also sees the ROS Python packages (--system-site-packages).
+# Add one with `uv add <package>`.
+[project]
+name = "{{ project_slug }}"
+version = "0.0.0"
+requires-python = ">=3.10"
+dependencies = []
+{%- endif %}
+
+[tool.codespell]
+skip = "*.lock"
+ignore-words-list = "sitl"
+
+[tool.mypy]
+# Resolve imports against this interpreter, so the ROS packages on its PYTHONPATH are found
+python_executable = "{{ '.venv/bin/python' if uv_venv else '/usr/bin/python3' }}"
+# ROS packages repeat module names (setup.py, test/test_flake8.py, ...), so name modules by path
+explicit_package_bases = true
+# Like ament_mypy's strict mode (ament_mypy --ament-strict), which rclpy uses
+strict = true
+pretty = true
+
+# The files ros2 pkg create generates: setup.py and the ament linter tests
+[[tool.mypy.overrides]]
+module = [
+  "src.*.setup",
+  "src.*.test.test_copyright",
+  "src.*.test.test_flake8",
+  "src.*.test.test_mypy",
+  "src.*.test.test_pep257",
+  "src.*.test.test_xmllint",
+]
+ignore_errors = true
+
+# Packages without type information, which mypy treats as Any instead of failing. When mypy reports "missing library
+# stubs or py.typed marker" for an import, add its package here{% if ros_distro in ["humble", "jazzy", "kilted"] %}
+# (on {{ ros_distro | capitalize }}, message packages such as std_msgs.* need this){% endif %}.
+{%- if untyped %}
+[[tool.mypy.overrides]]
+module = [
+{%- for module in untyped %}
+  "{{ module }}",
+{%- endfor %}
+]
+ignore_missing_imports = true
+{%- else %}
+# [[tool.mypy.overrides]]
+# module = ["<package from mypy's error>.*"]
+# ignore_missing_imports = true
+{%- endif %}
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+  "B",  # flake8-bugbear
+  "C4",  # flake8-comprehensions
+  "E",  # pycodestyle errors
+  "F",  # pyflakes
+  "I",  # isort
+  "N",  # pep8-naming
+  "Q",  # flake8-quotes
+  "UP",  # pyupgrade
+  "W",  # pycodestyle warnings
+]
+ignore = [
+  "UP031",  # printf-style formatting is common in ROS code, including ros2 pkg create's tests
+]
+
+[tool.ruff.lint.flake8-quotes]
+inline-quotes = "single"
+
+[tool.ruff.lint.isort]
+force-sort-within-sections = true
+order-by-type = false
+case-sensitive = false
+
+[tool.ruff.format]
+quote-style = "single"
+
+# Without a width, tombi doesn't wrap long lines
+[tool.tombi.format.rules]
+line-width = 120
+{%- if uv_venv %}
+
+[tool.uv]
+package = false
+python-preference = "only-system"
+{%- endif %}

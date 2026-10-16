@@ -1,0 +1,107 @@
+_min_copier_version: "9.3.0"
+_subdirectory: template
+
+project_name:
+  type: str
+  help: Project name
+  default: "{{ _copier_conf.dst_path | realpath | basename }}"
+
+project_slug:
+  type: str
+  help: Docker compose project name (shared by the dev container and the simulation)
+  default: "{{ project_name | lower | regex_replace('[^a-z0-9]+', '-') | trim('-') }}"
+  validator: >-
+    {% if not (project_slug | regex_search('^[a-z0-9][a-z0-9_-]*$')) %}
+    Use lowercase letters, digits, '-' and '_' only, starting with a letter or digit
+    {% endif %}
+
+ros_distro:
+  type: str
+  help: ROS 2 distribution
+  choices:
+    humble (Ubuntu 22.04, LTS): humble
+    jazzy (Ubuntu 24.04, LTS): jazzy
+    kilted (Ubuntu 24.04): kilted
+    lyrical (Ubuntu 26.04, LTS): lyrical
+    rolling (Ubuntu 26.04, development): rolling
+  default: jazzy
+
+ros2_testing:
+  type: bool
+  help: Install ROS packages from the ros2-testing apt repository (newer, less tested)?
+  default: false
+
+ardupilot:
+  type: bool
+  help: >-
+    Add the ArduPilot simulation (SITL, Mission Planner and MAVROS containers)?
+    Note that MAVROS isn't published for humble on arm64.
+  default: false
+
+ardupilot_version:
+  type: str
+  help: >-
+    ArduPilot Copter release for SITL, such as 4.3.8, 4.5.5 or 4.7.1. The SITL image's Ubuntu release follows it
+    (20.04 before 4.4, 22.04 for 4.4 and 4.5, 24.04 from 4.6).
+  default: "4.7.1"
+  when: "{{ ardupilot }}"
+  validator: >-
+    {% if not (ardupilot_version | regex_search('^4\\.[0-9]+\\.[0-9]+$')) %}
+    Use a Copter release number such as 4.5.5
+    {% endif %}
+
+ardupilot_gazebo:
+  type: bool
+  help: >-
+    Add a Gazebo mode (`just sim-gazebo-start`), where SITL flies in Gazebo through the ardupilot_gazebo plugin
+    instead of with its built-in physics? Uses the Gazebo version paired with the ROS distribution (jazzy or newer).
+  default: false
+  when: "{{ ardupilot }}"
+  validator: >-
+    {% if ardupilot_gazebo and ros_distro == 'humble' %}
+    Needs jazzy or newer: humble's Gazebo (Fortress) is too old for the plugin
+    {% endif %}
+
+gazebo_vm_rendering:
+  type: bool
+  help: >-
+    Render Gazebo for VMs such as VMware Fusion or Parallels on Apple Silicon? Uses the host's /dev/dri, renders
+    the GUI with Ogre 1, since the default Ogre 2 doesn't work there, and keeps the server and its sensors on
+    Ogre 2 with a workaround for VMware's driver.
+  default: false
+  when: "{{ ardupilot_gazebo }}"
+
+docker_access:
+  type: bool
+  help: >-
+    Let the dev container use the host's docker (docker-outside-of-docker)? This mounts the docker socket,
+    which gives the container root-equivalent access to the host. The ArduPilot simulation always needs it.
+  default: "{{ ardupilot }}"
+  when: "{{ not ardupilot }}"
+
+uv_venv:
+  type: bool
+  help: >-
+    Manage pip-only Python dependencies with uv? Creates a .venv that also sees
+    the ROS Python packages, and builds with it.
+  default: true
+
+claude_code:
+  type: bool
+  help: Install Claude Code in the dev container?
+  default: true
+
+vscode_extensions:
+  type: str
+  help: Optional VS Code extensions
+  multiselect: true
+  choices:
+    GitLens: eamodio.gitlens
+    C/C++ extension pack: ms-vscode.cpptools-extension-pack
+    GitHub Pull Requests: github.vscode-pull-request-github
+    JetBrains keymap: isudox.vscode-jetbrains-keybindings
+  default:
+    - eamodio.gitlens
+    - ms-vscode.cpptools-extension-pack
+    - github.vscode-pull-request-github
+    - isudox.vscode-jetbrains-keybindings

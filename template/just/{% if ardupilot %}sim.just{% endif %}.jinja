@@ -1,0 +1,16 @@
+# Start the simulation (SITL with its built-in physics) and follow the containers' logs in a tmux session
+[group('sim')]
+sim-start:
+    ./scripts/simulation/start_simulation.sh
+{%- if ardupilot_gazebo %}
+
+# Start the simulation with SITL flying in Gazebo, and follow the containers' logs in a tmux session
+[group('sim')]
+sim-gazebo-start:
+    ./scripts/simulation/start_simulation.sh gazebo
+{%- endif %}
+
+# Stop the simulation containers and the tmux session
+[group('sim')]
+sim-kill:
+    ./scripts/simulation/kill_simulation.sh
