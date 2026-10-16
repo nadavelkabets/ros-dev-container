@@ -84,7 +84,7 @@ uv_venv:
   help: >-
     Manage pip-only Python dependencies with uv? Creates a .venv that also sees
     the ROS Python packages, and builds with it.
-  default: false
+  default: true
 
 claude_code:
   type: bool

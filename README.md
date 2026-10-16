@@ -11,7 +11,7 @@ What a generated project gets:
 - Optional: a Gazebo mode for the simulation through the ardupilot_gazebo plugin, with GPU rendering settings for VMs
   on Apple Silicon (Ogre 1 for the GUI, a VMware driver workaround for Ogre 2's sensors)
 - Optional: access to the host's docker from the container (always on with the ArduPilot simulation)
-- Optional: a uv-managed `.venv` for pip-only Python dependencies that still sees the ROS packages
+- A uv-managed `.venv` for pip-only Python dependencies that still sees the ROS packages (on by default)
 - Optional: Claude Code in the container, with its config kept in a docker volume
 - Optional: the ros2-testing apt repository, and extra VS Code extensions
 

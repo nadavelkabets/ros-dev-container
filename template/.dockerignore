@@ -1,0 +1,11 @@
+# For images built from the project root, such as the simulation's: keeps git's data, colcon's output, the uv venv and
+# tool caches out of their build context. The dev container builds from .devcontainer/ instead.
+.git
+build
+install
+log
+.venv
+**/__pycache__
+**/.mypy_cache
+**/.pytest_cache
+**/.ruff_cache

@@ -24,7 +24,7 @@ jobs:
           - name: defaults (jazzy)
             data: ""
           - name: minimal (humble)
-            data: --data ros_distro=humble --data claude_code=false --data 'vscode_extensions=[]'
+            data: --data ros_distro=humble --data claude_code=false --data uv_venv=false --data 'vscode_extensions=[]'
           - name: ardupilot 4.3.8 (jazzy)
             data: --data ardupilot=true --data ardupilot_version=4.3.8
           - name: all options (lyrical)
