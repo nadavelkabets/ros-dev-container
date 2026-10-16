@@ -11,6 +11,8 @@ workspace_dir="/home/user/workspace"
 if [ -f "${workspace_dir}/.venv/bin/activate" ]; then
   # shellcheck source=/dev/null
   . "${workspace_dir}/.venv/bin/activate"
+  # Builds with the venv's Python, as `just build` does, so nodes can import the venv's packages
+  colcon() { python -m colcon "$@"; }
 fi
 
 if [ -f "${workspace_dir}/install/setup.bash" ]; then

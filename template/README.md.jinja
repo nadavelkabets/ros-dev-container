@@ -14,7 +14,8 @@ code .
 When VS Code finishes loading, click **Reopen in Container** in the bottom right corner.
 
 Put your ROS packages under `src/`. When the container is created, the workspace is built automatically if it has
-packages and hasn't been built yet.
+packages and hasn't been built yet. apt's package lists are fetched too, so `sudo apt install` works without an update
+first and package names tab-complete.
 
 `~/.bashrc` in the container sources ROS{% if uv_venv %}, the uv venv{% endif %} and the workspace overlay
 (`install/setup.bash`). VS Code takes its environment from it when it connects, so extensions see the same
@@ -56,8 +57,13 @@ Packages that declare ament linter tests (`ament_lint_auto`) still run them as p
 
 Python packages that aren't available through rosdep go in `pyproject.toml`, and `uv add <package>` adds one. uv
 installs them into `.venv`, which is created with `--system-site-packages` so the ROS Python packages stay
-importable. Terminals activate it automatically, and `just build` runs colcon from it, so the nodes' entry points
-use the venv's interpreter.
+importable. Terminals activate it automatically, and both `just build` and `colcon` in a terminal run colcon from it,
+so the nodes' entry points use the venv's interpreter.
+
+- A package in `pyproject.toml` that's also installed through apt (`numpy`, for example) takes precedence over the apt
+  version in the venv. ROS packages that your nodes import were built against the apt version, and can break.
+- rosdep keys that resolve to pip packages are installed with the system pip, not into the venv. Add those with
+  `uv add` instead.
 {%- endif %}
 {%- if claude_code %}
 

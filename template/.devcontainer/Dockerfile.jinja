@@ -11,18 +11,16 @@ RUN if id ubuntu >/dev/null 2>&1; then userdel --remove ubuntu; fi \
     && echo "$USER_NAME ALL=(root) NOPASSWD:ALL" > "/etc/sudoers.d/$USER_NAME" \
     && chmod 0440 "/etc/sudoers.d/$USER_NAME"
 
-# Keep downloaded packages in a BuildKit cache (the RUN --mount below), so rebuilds don't download them again.
-# The package lists stay in the image, so rosdep can install packages without an apt-get update first.
-RUN rm -f /etc/apt/apt.conf.d/docker-clean \
-    && echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
-{% if ros2_testing %}
-# Pull ROS packages from the ros2-testing repository (newer, less tested)
+# Downloads and package lists go to BuildKit caches instead of the image. docker-clean would delete the downloads, so
+# it's set aside for this step (on_create.sh removes it in the container, for apt's tab completion).
+# The upgrade keeps the base image's ROS packages in step with the ones installed here.
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    apt-get update && apt-get install -y ros2-testing-apt-source
-{% endif %}
-# The upgrade keeps the base image's ROS packages in step with the ones installed here (ROS releases them in syncs)
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    apt-get update && apt-get dist-upgrade -y && apt-get install -y \
+    --mount=type=cache,target=/var/lib/apt/lists,sharing=locked \
+    mv /etc/apt/apt.conf.d/docker-clean /etc/apt/docker-clean \
+{%- if ros2_testing %}
+    && apt-get update && apt-get install -y ros2-testing-apt-source \
+{%- endif %}
+    && apt-get update && apt-geSot dist-upgrade -y && apt-get install -y \
     bash-completion \
     curl \
     git \
@@ -37,7 +35,8 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     unzip \
     vim \
     wget \
-    x11-xserver-utils
+    x11-xserver-utils \
+    && mv /etc/apt/docker-clean /etc/apt/apt.conf.d/docker-clean
 
 COPY --from=ghcr.io/astral-sh/uv:0.13.0 /uv /uvx /usr/local/bin/
 # uv's cache and the workspace .venv live on different filesystems, so hardlinking always fails

@@ -12,7 +12,6 @@ services:
 {%- if claude_code %}
       - CLAUDE_CONFIG_DIR=/home/user/.claude
 {%- endif %}
-    command: sleep infinity
     volumes:
       - ..:/home/user/workspace
       - /tmp/.X11-unix:/tmp/.X11-unix

@@ -11,6 +11,9 @@
   "name": "{{ project_name }}",
   "dockerComposeFile": "docker-compose.yml",
   "service": "development-environment",
+  // Keeps the container running with the Dev Containers loop, which, unlike `sleep infinity`, exits right away on
+  // docker stop
+  "overrideCommand": true,
   "workspaceFolder": "/home/user/workspace",
   "containerUser": "user",
 {%- if docker_access %}

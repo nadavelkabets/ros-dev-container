@@ -4,6 +4,14 @@
 set -eo pipefail
 
 cd /home/user/workspace
+
+# apt in the container: package names tab-complete, and installs work without an update first. The image leaves the
+# package lists out and keeps Docker's apt config, which turns off the cache that completion reads. That config also
+# deleted downloaded packages after each install, which apt-get otherwise keeps, so installs are set to delete them.
+sudo rm -f /etc/apt/apt.conf.d/docker-clean
+echo 'APT::Keep-Downloaded-Packages "false";' | sudo tee /etc/apt/apt.conf.d/no-keep-downloads >/dev/null
+sudo apt-get update || echo "Fetching the apt package lists failed: run 'sudo apt-get update' before installing packages"
+
 # shellcheck source=/dev/null
 source "/opt/ros/${ROS_DISTRO}/setup.bash"
 
