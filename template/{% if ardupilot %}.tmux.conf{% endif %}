@@ -1,30 +1,25 @@
-# default shell
-set -g default-shell  "/bin/bash"
-set -g default-command "/bin/bash"
+# The simulation's tmux session (scripts/simulation/start_simulation.sh)
 set -g default-terminal "screen-256color"
-set-option -ga terminal-overrides ",xterm-256color:Tc"
-
-# prefix ctrl+b
-set -g prefix C-b
-
-# status bar customization
-set -g status-fg colour235
-set -g status-bg black
-set -g status-left-length 30
-set -g status-left "#{session_name}"
-set -g status-right "#{tmux list-windows | awk -F: 'BEGIN {ORS=\" \"} {print $2}'}"
-set -g status-justify centre
-set -g status-position bottom
+set -ga terminal-overrides ",xterm-256color:Tc"
 set -g set-titles on
 set -g set-titles-string "#S"
+setw -g allow-rename off
+
+# The mouse wheel scrolls back through the logs, and dragging copies (to the clipboard too, through the terminal)
+set -g mouse on
+# The simulation's logs fill tmux's default of 2000 lines quickly
+set -g history-limit 50000
+# Copying with the mouse keeps the scroll position, instead of jumping back to the live output
+bind -T copy-mode MouseDragEnd1Pane send -X copy-pipe-no-clear
+bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-pipe-no-clear
+
+# Status bar: the session name, then the windows in the middle, colored red, green, yellow and blue in turn
 set -g status-style fg=white,bg=black
+set -g status-left "#S"
+set -g status-left-length 30
+set -g status-right ""
+set -g status-justify centre
+set -g window-status-format "#[fg=white,bg=colour#{e|+|:#{e|m|:#{window_index},4},1}]#I:#W"
+set -g window-status-current-format "#[fg=white,bold,bg=colour#{e|+|:#{e|m|:#{window_index},4},1}]#I:#W"
 set -g pane-border-style fg=white
 set -g pane-active-border-style fg=yellow
-
-# set window status background color to red/green/yellow/blue
-set -g window-status-format "#[fg=white,bg=colour#(echo $(($(tmux display -p '#{window_index}') % 4 + 1)))]#I:#W"
-set -g window-status-current-format "#[fg=white bold,bg=colour#(echo $(($(tmux display -p '#{window_index}') % 4 + 1))), bold]#I:#W"
-
-set -g mouse on
-
-setw -g allow-rename off

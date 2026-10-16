@@ -1,4 +1,11 @@
-# The simulation images only copy from resources/, so the rest of the workspace (build/, install/, src/, .venv, ...)
-# stays out of the build context
-*
-!resources
+# The simulation images build from the project root. This keeps git's data, colcon's output, the uv venv and tool
+# caches out of their build context.
+.git
+build
+install
+log
+.venv
+**/__pycache__
+**/.mypy_cache
+**/.pytest_cache
+**/.ruff_cache
