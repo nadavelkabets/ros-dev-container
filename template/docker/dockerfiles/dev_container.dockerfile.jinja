@@ -25,11 +25,6 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     apt-get update && apt-get dist-upgrade -y && apt-get install -y \
     bash-completion \
     curl \
-{%- if docker_access %}
-    docker-buildx \
-    docker-compose-v2 \
-    docker.io \
-{%- endif %}
     git \
     htop \
     iputils-ping \

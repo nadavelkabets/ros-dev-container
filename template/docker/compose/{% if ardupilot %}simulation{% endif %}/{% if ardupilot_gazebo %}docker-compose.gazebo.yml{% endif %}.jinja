@@ -1,0 +1,44 @@
+# Layered on docker-compose.yml by `just sim-gazebo-start`: SITL flies in Gazebo through the ardupilot_gazebo plugin,
+# instead of with its built-in physics
+services:
+  gazebo:
+    build:
+      context: ../../..
+      dockerfile: docker/dockerfiles/gazebo.dockerfile
+    # The ardupilot_gazebo plugin and SITL talk over 127.0.0.1
+    network_mode: service:sitl
+    environment:
+      - DISPLAY=${DISPLAY}
+      # Qt's X11 shared memory doesn't work across containers
+      - QT_X11_NO_MITSHM=1
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+{%- if gazebo_vm_rendering %}
+    # Renders on the host's GPU. Gazebo runs as root, so it can open these device nodes whichever group owns them.
+    devices:
+      - /dev/dri:/dev/dri
+{%- endif %}
+    command:
+      - gz
+      - sim
+      - -r
+      - iris_runway.sdf
+{%- if gazebo_vm_rendering %}
+      # Ogre 2 (the default) doesn't work in VMs such as VMware Fusion or Parallels on Apple Silicon
+      - --render-engine
+      - ogre
+{%- endif %}
+
+  sitl:
+    command:
+      - sim_vehicle.py
+      - -v
+      - ArduCopter
+      - -f
+      - gazebo-iris
+      - --model
+      - JSON
+      - --no-rebuild
+      - --no-mavproxy
+      - -l
+      - 31.4993848,34.8041511,0,0

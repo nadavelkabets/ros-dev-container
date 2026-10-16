@@ -399,7 +399,6 @@ tags
 
 ### Project ###
 # The Python template ignores .env, but this one only holds the compose project name.
-# docker/compose/dev_container/.env is generated on the host when the container starts, and stays ignored.
 !/.env
 # ROS packages can contain lib/ directories (the Python template ignores them)
 !src/**/lib/

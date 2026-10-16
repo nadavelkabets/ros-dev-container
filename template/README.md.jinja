@@ -71,13 +71,15 @@ volume, so they survive container rebuilds. Your host `~/.claude` isn't shared w
 ## Simulation
 
 `just sim-start` starts the simulation containers from inside the dev container and opens a tmux window with each
-one's logs; `just sim-kill` stops them.
-{%- if ardupilot_gazebo %} ArduPilot SITL flies in Gazebo through the
-[ardupilot_gazebo](https://github.com/ArduPilot/ardupilot_gazebo) plugin (the `iris_runway.sdf` world). The `gazebo`
-and `sitl` containers share a network, so the plugin and SITL talk over 127.0.0.1.
-{%- else %} ArduPilot SITL simulates the vehicle with its built-in physics.
-{%- endif %} MAVROS connects to SITL, and forwards
-MAVLink to Mission Planner.
+one's logs; `just sim-kill` stops them. ArduPilot SITL (Copter {{ ardupilot_version }}) simulates the vehicle with its
+built-in physics, MAVROS connects to it, and forwards MAVLink to Mission Planner.
+{%- if ardupilot_gazebo %}
+
+`just sim-gazebo-start` starts the same containers with SITL flying in Gazebo through the
+[ardupilot_gazebo](https://github.com/ArduPilot/ardupilot_gazebo) plugin (the `iris_runway.sdf` world), by layering
+`docker/compose/simulation/docker-compose.gazebo.yml` on `docker-compose.yml`. The `gazebo` and `sitl` containers share
+a network, so the plugin and SITL talk over 127.0.0.1.
+{%- endif %}
 {%- if gazebo_vm_rendering %}
 
 Gazebo renders with Ogre 1 through the host's `/dev/dri`, for VMs such as VMware Fusion or Parallels on Apple Silicon
@@ -89,11 +91,18 @@ where Ogre 2 doesn't work.
 ## Docker inside the container
 
 The container uses the host's docker daemon through its socket (docker-outside-of-docker), which gives it
-root-equivalent access to the host. Before the container starts, `scripts/dev_container/initialize.sh` runs on the
-host and records the socket's group id, and docker compose adds the container user to that group.
+root-equivalent access to the host. The
+[docker-outside-of-docker](https://github.com/devcontainers/features/tree/main/src/docker-outside-of-docker) dev
+container feature installs the docker CLI and gives the container user access to the socket.
 
 Containers started from inside run next to the dev container on the host, so paths in `docker run -v` and compose
-bind mounts refer to host paths, not container paths.
+bind mounts refer to host paths, not container paths. Relative paths resolve to `/home/user/workspace`, which doesn't
+exist on the host. Build them from `$LOCAL_WORKSPACE_FOLDER`, the workspace's path on the host, instead:
+
+```yaml
+volumes:
+  - ${LOCAL_WORKSPACE_FOLDER}/config/params.yaml:/config/params.yaml
+```
 {%- endif %}
 
 ## Git over SSH

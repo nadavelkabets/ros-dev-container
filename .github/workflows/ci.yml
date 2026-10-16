@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v10
+      - uses: astral-sh/setup-uv@v10.3.0  # setup-uv publishes no major version tags since v8
       - name: Lint the template repository
         run: uvx --with pre-commit-uv pre-commit run --all-files --show-diff-on-failure
 
@@ -25,15 +25,17 @@ jobs:
             data: ""
           - name: minimal (humble)
             data: --data ros_distro=humble --data claude_code=false --data 'vscode_extensions=[]'
+          - name: ardupilot 4.3.8 (jazzy)
+            data: --data ardupilot=true --data ardupilot_version=4.3.8
           - name: all options (lyrical)
             data: >-
               --data ros_distro=lyrical --data ros2_testing=true --data ardupilot=true
-              --data uv_venv=true --data ci=true
+              --data ardupilot_gazebo=true --data gazebo_vm_rendering=true --data uv_venv=true --data ci=true
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: astral-sh/setup-uv@v10
+      - uses: astral-sh/setup-uv@v10.3.0  # setup-uv publishes no major version tags since v8
 
       - name: Generate a project
         run: |

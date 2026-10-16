@@ -1,9 +1,7 @@
 #!/bin/bash
-# Entrypoint of the gazebo and sitl containers: loads ROS (which provides Gazebo) and ArduPilot's environment
+# Entrypoint of the gazebo container: loads ROS, which provides Gazebo
 set -e
 
 # shellcheck source=/dev/null
 source "/opt/ros/${ROS_DISTRO}/setup.bash"
-# shellcheck source=/dev/null
-source "${HOME}/.ardupilot_env"
 exec "$@"

@@ -12,12 +12,18 @@
   "dockerComposeFile": [
     "../docker/compose/dev_container/docker-compose.yml"
   ],
-  "service": "development_environment",
+  "service": "development-environment",
   "workspaceFolder": "/home/user/workspace",
   "containerUser": "user",
 {%- if docker_access %}
-  // Runs on the host: hands the docker socket's group id to docker compose
-  "initializeCommand": "./scripts/dev_container/initialize.sh",
+  // Installs the docker CLI and gives the container user access to the host's docker socket
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+  },
+  // The workspace's path on the host, for bind mounts in containers started from inside
+  "containerEnv": {
+    "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}"
+  },
 {%- endif %}
   // VS Code takes its environment (ROS, the workspace overlay, the uv venv) from ~/.bashrc through this probe
   "userEnvProbe": "loginInteractiveShell",

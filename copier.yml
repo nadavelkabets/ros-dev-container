@@ -9,7 +9,7 @@ project_name:
 project_slug:
   type: str
   help: Docker compose project name (shared by the dev container and the simulation)
-  default: "{{ project_name | lower | regex_replace('[^a-z0-9_-]+', '_') }}"
+  default: "{{ project_name | lower | regex_replace('[^a-z0-9]+', '-') | trim('-') }}"
   validator: >-
     {% if not (project_slug | regex_search('^[a-z0-9][a-z0-9_-]*$')) %}
     Use lowercase letters, digits, '-' and '_' only, starting with a letter or digit
@@ -38,16 +38,28 @@ ardupilot:
     Note that MAVROS isn't published for humble on arm64.
   default: false
 
+ardupilot_version:
+  type: str
+  help: >-
+    ArduPilot Copter release for SITL, such as 4.3.8, 4.5.5 or 4.7.1. The SITL image's Ubuntu release follows it
+    (20.04 before 4.4, 22.04 for 4.4 and 4.5, 24.04 from 4.6).
+  default: "4.7.1"
+  when: "{{ ardupilot }}"
+  validator: >-
+    {% if not (ardupilot_version | regex_search('^4\\.[0-9]+\\.[0-9]+$')) %}
+    Use a Copter release number such as 4.5.5
+    {% endif %}
+
 ardupilot_gazebo:
   type: bool
   help: >-
-    Fly SITL in Gazebo through the ardupilot_gazebo plugin, instead of with SITL's built-in physics?
-    Uses the Gazebo version paired with the ROS distribution.
+    Add a Gazebo mode (`just sim-gazebo-start`), where SITL flies in Gazebo through the ardupilot_gazebo plugin
+    instead of with its built-in physics? Uses the Gazebo version paired with the ROS distribution (jazzy or newer).
   default: false
   when: "{{ ardupilot }}"
   validator: >-
     {% if ardupilot_gazebo and ros_distro == 'humble' %}
-    ardupilot_gazebo needs Gazebo Harmonic or newer, and humble is paired with Fortress: pick jazzy or newer
+    Needs jazzy or newer: humble's Gazebo (Fortress) is too old for the plugin
     {% endif %}
 
 gazebo_vm_rendering:
