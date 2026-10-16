@@ -11,6 +11,9 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v10.3.0  # setup-uv publishes no major version tags since v8
+        with:
+          # This repository has no pyproject.toml or uv.lock to key uv's cache on, and the uvx installs are quick
+          enable-cache: false
       - name: Lint the template repository
         run: uvx --with pre-commit-uv pre-commit run --all-files --show-diff-on-failure
 
@@ -36,6 +39,9 @@ jobs:
         with:
           fetch-depth: 0
       - uses: astral-sh/setup-uv@v10.3.0  # setup-uv publishes no major version tags since v8
+        with:
+          # This repository has no pyproject.toml or uv.lock to key uv's cache on, and the uvx installs are quick
+          enable-cache: false
 
       - name: Generate a project
         run: |
@@ -46,6 +52,10 @@ jobs:
       # Lints the fresh project, then adds a ROS package and builds and tests it, inside its dev container
       - name: Lint, build and test in the dev container
         uses: devcontainers/ci@v0.3
+        env:
+          # Buildx 0.37.2 refuses the Dockerfile the dev container CLI generates outside the build context. Remove once
+          # https://github.com/devcontainers/cli/issues/1320 is fixed.
+          BUILDX_BAKE_ENTITLEMENTS_FS: "0"
         with:
           subFolder: generated
           push: never
