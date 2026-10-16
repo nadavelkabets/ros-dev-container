@@ -1,5 +1,5 @@
 {%- set gz_version = {"jazzy": "harmonic", "kilted": "ionic", "lyrical": "jetty", "rolling": "jetty"}[ros_distro] -%}
-# Gazebo with the ardupilot_gazebo plugin. ArduPilot SITL runs in its own image (sitl.dockerfile), and the two talk
+# Gazebo with the ardupilot_gazebo plugin. ArduPilot SITL runs in its own image (sitl.Dockerfile), and the two talk
 # over the network they share.
 FROM ros:{{ ros_distro }}-ros-base
 

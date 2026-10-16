@@ -1,0 +1,5 @@
+# The simulation images only copy from these directories, so the rest of the workspace (build/, install/, src/,
+# .venv, ...) stays out of the build context
+*
+!scripts
+!resources

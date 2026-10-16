@@ -4,7 +4,7 @@ services:
   gazebo:
     build:
       context: ../../..
-      dockerfile: docker/dockerfiles/gazebo.dockerfile
+      dockerfile: docker/dockerfiles/gazebo.Dockerfile
     # The ardupilot_gazebo plugin and SITL talk over 127.0.0.1
     network_mode: service:sitl
     environment:

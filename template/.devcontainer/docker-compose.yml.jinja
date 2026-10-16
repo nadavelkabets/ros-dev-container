@@ -2,9 +2,7 @@ name: {{ project_slug }}
 
 services:
   development-environment:
-    build:
-      context: ../../..
-      dockerfile: docker/dockerfiles/dev_container.dockerfile
+    build: .
     environment:
       - DISPLAY=${DISPLAY}
 {%- if ardupilot %}
@@ -16,7 +14,7 @@ services:
 {%- endif %}
     command: sleep infinity
     volumes:
-      - ../../..:/home/user/workspace
+      - ..:/home/user/workspace
       - /tmp/.X11-unix:/tmp/.X11-unix
       - pre-commit-cache:/home/user/.cache/pre-commit
 {%- if claude_code %}

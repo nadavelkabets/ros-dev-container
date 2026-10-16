@@ -43,7 +43,7 @@ COPY --from=ghcr.io/astral-sh/uv:0.13.0 /uv /uvx /usr/local/bin/
 # uv's cache and the workspace .venv live on different filesystems, so hardlinking always fails
 ENV UV_LINK_MODE=copy
 
-COPY scripts/dev_container/bashrc.sh /usr/local/share/dev_container/bashrc.sh
+COPY bashrc.sh /usr/local/share/dev_container/bashrc.sh
 
 USER $USER_NAME
 ENV PATH="/home/$USER_NAME/.local/bin:$PATH"

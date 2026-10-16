@@ -54,9 +54,6 @@ repos:
     rev: v2.15.1
     hooks:
       - id: hadolint
-        # the Dockerfiles here are named *.dockerfile, which pre-commit doesn't detect as Dockerfiles
-        types: [file]
-        files: (^|/)(Dockerfile|[^/]+\.dockerfile)$
 
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.38.0

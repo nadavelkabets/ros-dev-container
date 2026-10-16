@@ -9,9 +9,7 @@
 ] + vscode_extensions + (["anthropic.claude-code"] if claude_code else []) -%}
 {
   "name": "{{ project_name }}",
-  "dockerComposeFile": [
-    "../docker/compose/dev_container/docker-compose.yml"
-  ],
+  "dockerComposeFile": "docker-compose.yml",
   "service": "development-environment",
   "workspaceFolder": "/home/user/workspace",
   "containerUser": "user",
@@ -28,7 +26,7 @@
   // VS Code takes its environment (ROS, the workspace overlay, the uv venv) from ~/.bashrc through this probe
   "userEnvProbe": "loginInteractiveShell",
   // Runs before VS Code connects, so the probe already sees the built workspace
-  "onCreateCommand": "./scripts/dev_container/on_create.sh",
+  "onCreateCommand": "./.devcontainer/on_create.sh",
   "customizations": {
     "vscode": {
       "extensions": [

@@ -4,7 +4,7 @@ services:
   sitl:
     build:
       context: ../../..
-      dockerfile: docker/dockerfiles/sitl.dockerfile
+      dockerfile: docker/dockerfiles/sitl.Dockerfile
     stdin_open: true
     tty: true
     command:
@@ -21,7 +21,7 @@ services:
   mission-planner:
     build:
       context: ../../..
-      dockerfile: docker/dockerfiles/mission_planner.dockerfile
+      dockerfile: docker/dockerfiles/mission_planner.Dockerfile
     environment:
       - DISPLAY=${DISPLAY}
     privileged: true
@@ -33,7 +33,7 @@ services:
   mavros:
     build:
       context: ../../..
-      dockerfile: docker/dockerfiles/mavros.dockerfile
+      dockerfile: docker/dockerfiles/mavros.Dockerfile
     command:
       - --ros-args
       - -p
