@@ -1,0 +1,67 @@
+# Settings for the linters and formatters in .pre-commit-config.yaml. yamllint, hadolint and EditorConfig can't read
+# this file, so they have their own (.yamllint.yaml, .hadolint.yaml and .editorconfig).
+{%- if uv_venv %}
+
+# Python dependencies that aren't available as ROS or apt packages.
+# They're installed into .venv, which also sees the ROS Python packages (--system-site-packages).
+# Add one with `uv add <package>`.
+[project]
+name = "{{ project_slug }}"
+version = "0.0.0"
+requires-python = ">=3.10"
+dependencies = []
+{%- endif %}
+
+[tool.codespell]
+skip = "*.lock"
+ignore-words-list = "sitl"
+
+[tool.mypy]
+# Resolve imports against this interpreter, so the ROS packages on its PYTHONPATH are found
+python_executable = "{{ '.venv/bin/python' if uv_venv else '/usr/bin/python3' }}"
+# ROS packages repeat module names (setup.py, test/test_flake8.py, ...), so name modules by path
+explicit_package_bases = true
+ignore_missing_imports = true
+check_untyped_defs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+  "B",  # flake8-bugbear
+  "C4",  # flake8-comprehensions
+  "E",  # pycodestyle errors
+  "F",  # pyflakes
+  "I",  # isort
+  "N",  # pep8-naming
+  "Q",  # flake8-quotes
+  "UP",  # pyupgrade
+  "W",  # pycodestyle warnings
+]
+ignore = [
+  "UP031",  # printf-style formatting is common in ROS code, including ros2 pkg create's tests
+]
+
+[tool.ruff.lint.flake8-quotes]
+inline-quotes = "single"
+
+[tool.ruff.lint.isort]
+force-sort-within-sections = true
+order-by-type = false
+case-sensitive = false
+
+[tool.ruff.format]
+quote-style = "single"
+
+# Without a width, tombi doesn't wrap long lines
+[tool.tombi.format.rules]
+line-width = 120
+{%- if uv_venv %}
+
+[tool.uv]
+package = false
+python-preference = "only-system"
+{%- endif %}

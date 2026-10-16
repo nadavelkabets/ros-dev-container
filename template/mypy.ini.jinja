@@ -1,9 +1,0 @@
-[mypy]
-# Resolve imports against this interpreter, so the ROS packages on its PYTHONPATH are found
-python_executable = {{ '.venv/bin/python' if uv_venv else '/usr/bin/python3' }}
-# ROS packages repeat module names (setup.py, test/test_flake8.py, ...), so name modules by path
-explicit_package_bases = True
-ignore_missing_imports = True
-check_untyped_defs = True
-warn_redundant_casts = True
-warn_unused_ignores = True

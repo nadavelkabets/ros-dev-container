@@ -1,4 +1,0 @@
-[codespell]
-skip = *.lock
-# SITL is ArduPilot's software-in-the-loop simulator
-ignore-words-list = sitl

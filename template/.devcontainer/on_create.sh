@@ -15,7 +15,8 @@ sudo apt-get update || echo "Fetching the apt package lists failed: run 'sudo ap
 # shellcheck source=/dev/null
 source "/opt/ros/${ROS_DISTRO}/setup.bash"
 
-if [ -f pyproject.toml ]; then
+# uv manages the Python dependencies when pyproject.toml has a [project] table
+if grep -qs '^\[project\]' pyproject.toml; then
   # --system-site-packages keeps the ROS Python packages importable from the venv
   uv venv --system-site-packages --python /usr/bin/python3 --allow-existing .venv
   touch .venv/COLCON_IGNORE

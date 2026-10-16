@@ -33,7 +33,7 @@ repos:
         args: [--fix]
       - id: ruff-format
 
-  # Settings, including the interpreter whose packages (ROS included) it checks against, are in mypy.ini
+  # Settings, including the interpreter whose packages (ROS included) it checks against, are in pyproject.toml
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v2.4.0
     hooks:

@@ -49,8 +49,8 @@ Commits made outside the container need `pre-commit` installed on the host.
 - YAML: yamllint; GitHub workflows: actionlint; TOML: tombi; justfiles: `just --fmt`
 - General: codespell, whitespace, file endings, JSON, XML and merge-conflict checks
 
-Tool settings are in `ruff.toml`, `mypy.ini`, `.yamllint.yaml`, `.hadolint.yaml`, `tombi.toml`, `.codespellrc` and
-`.editorconfig`. They all allow lines of up to 120 characters.
+Tool settings are in `pyproject.toml` (ruff, mypy, codespell and tombi), `.yamllint.yaml`, `.hadolint.yaml` and
+`.editorconfig`, the three tools that can't read it. They all allow lines of up to 120 characters.
 Packages that declare ament linter tests (`ament_lint_auto`) still run them as part of `just test`.
 {%- if uv_venv %}
 

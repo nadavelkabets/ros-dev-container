@@ -7,7 +7,7 @@ deps:
     sudo apt-get update
     rosdep update
     rosdep install --from-paths src --ignore-src -y
-    if [ -f pyproject.toml ]; then uv sync; fi
+    if grep -qs '^\[project\]' pyproject.toml; then uv sync; fi
 
 # Build the workspace
 [group('ros')]
