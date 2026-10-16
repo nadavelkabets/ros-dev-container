@@ -8,8 +8,8 @@ What a generated project gets:
 - [just](https://just.systems) recipes to build, test and lint (`justfile` and `just/`)
 - Linting through pre-commit: ruff, mypy, shellcheck, shfmt, hadolint, yamllint, actionlint, tombi and codespell
 - Optional: an ArduPilot simulation (SITL at the Copter release you pick, Mission Planner and MAVROS containers)
-- Optional: a Gazebo mode for the simulation through the ardupilot_gazebo plugin, with Ogre 1 rendering for VMs on Apple
-  Silicon
+- Optional: a Gazebo mode for the simulation through the ardupilot_gazebo plugin, with GPU rendering settings for VMs
+  on Apple Silicon (Ogre 1 for the GUI, a VMware driver workaround for Ogre 2's sensors)
 - Optional: access to the host's docker from the container (always on with the ArduPilot simulation)
 - Optional: a uv-managed `.venv` for pip-only Python dependencies that still sees the ROS packages
 - Optional: Claude Code in the container, with its config kept in a docker volume

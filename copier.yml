@@ -65,8 +65,9 @@ ardupilot_gazebo:
 gazebo_vm_rendering:
   type: bool
   help: >-
-    Render Gazebo with Ogre 1 through the host's /dev/dri? Needed in VMs such as VMware Fusion or Parallels
-    on Apple Silicon, where the default Ogre 2 engine doesn't work.
+    Render Gazebo for VMs such as VMware Fusion or Parallels on Apple Silicon? Uses the host's /dev/dri, renders
+    the GUI with Ogre 1, since the default Ogre 2 doesn't work there, and keeps the server and its sensors on
+    Ogre 2 with a workaround for VMware's driver.
   default: false
   when: "{{ ardupilot_gazebo }}"
 

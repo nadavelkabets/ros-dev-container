@@ -89,8 +89,10 @@ a network, so the plugin and SITL talk over 127.0.0.1.
 {%- endif %}
 {%- if gazebo_vm_rendering %}
 
-Gazebo renders with Ogre 1 through the host's `/dev/dri`, for VMs such as VMware Fusion or Parallels on Apple Silicon
-where Ogre 2 doesn't work.
+Gazebo renders through the host's `/dev/dri`, for VMs such as VMware Fusion or Parallels on Apple Silicon. The GUI
+uses Ogre 1, since Ogre 2 doesn't work there, while the server stays on Ogre 2 for sensors such as `gpu_lidar`, which
+return only `range_min` on Ogre 1. `MESA_EXTENSION_OVERRIDE` turns off an OpenGL extension that VMware's driver
+mishandles, which would otherwise leave those sensors with only every third frame.
 {%- endif %}
 {%- endif %}
 {%- if docker_access %}

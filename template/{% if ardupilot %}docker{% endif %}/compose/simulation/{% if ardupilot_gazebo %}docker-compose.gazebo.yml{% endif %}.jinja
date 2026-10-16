@@ -11,6 +11,11 @@ services:
       - DISPLAY=${DISPLAY}
       # Qt's X11 shared memory doesn't work across containers
       - QT_X11_NO_MITSHM=1
+{%- if gazebo_vm_rendering %}
+      # VMware's driver doesn't keep the buffers Ogre 2 maps persistently coherent, so sensors such as gpu_lidar get
+      # only every third frame. Without this OpenGL extension, Ogre 2 doesn't map them persistently.
+      - MESA_EXTENSION_OVERRIDE=-GL_ARB_buffer_storage
+{%- endif %}
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
 {%- if gazebo_vm_rendering %}
@@ -24,8 +29,9 @@ services:
       - -r
       - iris_runway.sdf
 {%- if gazebo_vm_rendering %}
-      # Ogre 2 (the default) doesn't work in VMs such as VMware Fusion or Parallels on Apple Silicon
-      - --render-engine
+      # Ogre 2 (the default) doesn't work for the GUI in VMs such as VMware Fusion or Parallels on Apple Silicon. Only
+      # the GUI uses Ogre 1: the server stays on Ogre 2, since gpu_lidar returns only range_min on Ogre 1.
+      - --render-engine-gui
       - ogre
 {%- endif %}
 
