@@ -25,6 +25,9 @@ repos:
     rev: v2.4.3
     hooks:
       - id: codespell
+        # Its settings are in pyproject.toml, which it reads with tomllib from Python 3.11 on, and with tomli before
+        # (Humble has Python 3.10)
+        additional_dependencies: [tomli]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.17.0
