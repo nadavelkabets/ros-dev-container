@@ -13,7 +13,6 @@ What a generated project gets:
 - Optional: access to the host's docker from the container (always on with the ArduPilot simulation)
 - Optional: a uv-managed `.venv` for pip-only Python dependencies that still sees the ROS packages
 - Optional: Claude Code in the container, with its config kept in a docker volume
-- Optional: a GitHub Actions workflow that lints, builds and tests inside the dev container
 - Optional: the ros2-testing apt repository, and extra VS Code extensions
 
 ## Usage

@@ -1,5 +1,5 @@
 # Aligned with the ament_flake8 conventions ROS 2 packages are tested with
-line-length = 99
+line-length = 120
 
 [lint]
 select = [

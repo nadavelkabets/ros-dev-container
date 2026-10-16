@@ -30,7 +30,7 @@ jobs:
           - name: all options (lyrical)
             data: >-
               --data ros_distro=lyrical --data ros2_testing=true --data ardupilot=true
-              --data ardupilot_gazebo=true --data gazebo_vm_rendering=true --data uv_venv=true --data ci=true
+              --data ardupilot_gazebo=true --data gazebo_vm_rendering=true --data uv_venv=true
     steps:
       - uses: actions/checkout@v7
         with:

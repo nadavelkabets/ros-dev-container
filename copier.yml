@@ -91,11 +91,6 @@ claude_code:
   help: Install Claude Code in the dev container?
   default: true
 
-ci:
-  type: bool
-  help: Add a GitHub Actions workflow that lints, builds and tests the workspace inside the dev container?
-  default: false
-
 vscode_extensions:
   type: str
   help: Optional VS Code extensions

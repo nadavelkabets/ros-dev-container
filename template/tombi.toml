@@ -1,0 +1,3 @@
+# TOML formatting (tombi-format in .pre-commit-config.yaml). Without a width, tombi doesn't wrap long lines.
+[format.rules]
+line-width = 120

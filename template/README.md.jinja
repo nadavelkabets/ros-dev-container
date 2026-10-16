@@ -49,7 +49,8 @@ Commits made outside the container need `pre-commit` installed on the host.
 - YAML: yamllint; GitHub workflows: actionlint; TOML: tombi; justfiles: `just --fmt`
 - General: codespell, whitespace, file endings, JSON, XML and merge-conflict checks
 
-Tool settings are in `ruff.toml`, `mypy.ini`, `.yamllint.yaml`, `.hadolint.yaml`, `.codespellrc` and `.editorconfig`.
+Tool settings are in `ruff.toml`, `mypy.ini`, `.yamllint.yaml`, `.hadolint.yaml`, `tombi.toml`, `.codespellrc` and
+`.editorconfig`. They all allow lines of up to 120 characters.
 Packages that declare ament linter tests (`ament_lint_auto`) still run them as part of `just test`.
 {%- if uv_venv %}
 
@@ -118,13 +119,6 @@ volumes:
 
 VS Code forwards your host's SSH agent into the container, so git over SSH works without mounting `~/.ssh`. Load your
 key into the agent on the host first (`ssh-add -l` lists the loaded keys).
-{%- if ci %}
-
-## CI
-
-`.github/workflows/ci.yml` runs `just lint`, `just build` and `just test` on GitHub Actions, inside the same dev
-container used for development.
-{%- endif %}
 
 ## Updating
 
